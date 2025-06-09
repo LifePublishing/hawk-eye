@@ -1,6 +1,6 @@
 AuthType Basic
-AuthName "Input ID and Password."
-AuthUserFile /home/avantetool/truth-tool.jp/public_html/truth-soft/.htpasswd
+AuthName "Hawk-Eye Access"
+AuthUserFile /home/【あなたのユーザー名】/【あなたのドメイン】/public_html/hawk-eye/.htpasswd
 <Limit GET>
 require valid-user
 </Limit>
