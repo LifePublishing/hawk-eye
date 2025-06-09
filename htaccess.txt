@@ -1,0 +1,10 @@
+AuthType Basic
+AuthName "Input ID and Password."
+AuthUserFile /home/avantetool/truth-tool.jp/public_html/truth-soft/.htpasswd
+<Limit GET>
+require valid-user
+</Limit>
+
+<Files ~ "^.(htpasswd|htaccess)$">
+    deny from all
+</Files>

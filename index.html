@@ -1,0 +1,945 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>自動計算ソフトウェアTRUTH</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Content-Script-Type" content="text/javascript">
+<meta name="robots" content="noindex,nofollow" />
+<meta name="viewport" content="width=device-width" />
+<link rel="stylesheet" href="css/normalize.css" />
+<link rel="stylesheet" href="css/style.css" />
+<script src="js/scrollsmoothly.js"></script>
+
+<script type="text/javascript">
+
+function myCalc() {
+//	alert("計算ボタン");
+
+	//入力フィールドの値を取得する(文字列を数字として取得する)
+	//入力チェックする為、一度文字列のまま取得する
+	var inProfitNow = document.getElementById("inProfitNow").value;			//営業利益（今期）
+	var inProfitNext = document.getElementById("inProfitNext").value;		//営業利益（来季）
+	var inProfitNext2 = document.getElementById("inProfitNext2").value;		//営業利益（2期後）
+	var inPriceNow = document.getElementById("inPriceNow").value;			//減価償却費(今期)
+	var inEquipmentNow = document.getElementById("inEquipmentNow").value;	//設備投資額(今期)
+	var inDebt = document.getElementById("inDebt").value;					//有利子負債額
+	var inCurrent = document.getElementById("inCurrent").value;				//時価総額
+	var inRoe = document.getElementById("inRoe").value;						//ROE
+	var inDividend = document.getElementById("inDividend").value;			//1株あたりの配当金
+	var inEps = document.getElementById("inEps").value;						//EPS
+	var inCnt = document.getElementById("inCnt").value;						//発行済み株式数
+	
+	//未入力チェック
+	document.getElementById("error1").innerHTML = "";
+	document.getElementById("error2").innerHTML = "";
+	document.getElementById("error3").innerHTML = "";
+	document.getElementById("error4").innerHTML = "";
+	document.getElementById("error5").innerHTML = "";
+	document.getElementById("error6").innerHTML = "";
+	document.getElementById("error7").innerHTML = "";
+	document.getElementById("error8").innerHTML = "";
+	document.getElementById("error9").innerHTML = "";
+	document.getElementById("error10").innerHTML = "";
+	document.getElementById("error11").innerHTML = "";
+	if(!myChkStr(inProfitNow,inProfitNext,inProfitNext2,inPriceNow,inEquipmentNow,inDebt,inCurrent,inRoe,inDividend,inEps,inCnt)){
+		return;
+	};
+	
+	//文字列を数字に変換
+	inProfitNow = parseFloat(inProfitNow);			//営業利益（今期）
+	inProfitNext = parseFloat(inProfitNext);		//営業利益（来季）
+	inProfitNext2 = parseFloat(inProfitNext2);		//営業利益（2期後）
+	inPriceNow = parseFloat(inPriceNow);			//減価償却費(今期)
+	inEquipmentNow = parseFloat(inEquipmentNow);	//設備投資額(今期)
+	inDebt = parseFloat(inDebt);					//有利子負債額
+	inCurrent = parseFloat(inCurrent);				//時価総額
+	inRoe = parseFloat(inRoe);						//ROE
+	inDividend = parseFloat(inDividend);			//1株あたりの配当金
+	inEps = parseFloat(inEps);						//EPS
+	inCnt = parseFloat(inCnt);						//発行済み株式数
+
+//console.log("inCnt = " + typeof inCnt);
+	
+	//数字入力チェック
+	document.getElementById("error1").innerHTML = "";
+	document.getElementById("error2").innerHTML = "";
+	document.getElementById("error3").innerHTML = "";
+	document.getElementById("error4").innerHTML = "";
+	document.getElementById("error5").innerHTML = "";
+	document.getElementById("error6").innerHTML = "";
+	document.getElementById("error7").innerHTML = "";
+	document.getElementById("error8").innerHTML = "";
+	document.getElementById("error9").innerHTML = "";
+	document.getElementById("error10").innerHTML = "";
+	document.getElementById("error11").innerHTML = "";
+	if(!myChkNum(inProfitNow,inProfitNext,inProfitNext2,inPriceNow,inEquipmentNow,inDebt,inCurrent,inRoe,inDividend,inEps,inCnt)){
+		return;
+	};
+	
+//	alert("営業利益（今期）=" + inProfitNow + 
+//		  "  営業利益（来季）=" + inProfitNext + 
+//		  "  営業利益（2期後）=" + inProfitNext2 + 
+//		  "  減価償却費=" + inPriceNow + 
+//		  "  設備投資額=" + inEquipmentNow + 
+//		  "  有利子負債額=" + inDebt + 
+//		  "  時価総額=" + inCurrent + 
+//		  "  ROE=" + inRoe + 
+//		  "  1株あたりの配当金=" + inDividend + 
+//		  "  EPS=" + inEps + 
+//		  "  発行済み株式数=" + inCnt);
+	
+	//【フリーキャッシュフローの計算】
+	//------------------------------------------------------------------------------------
+	var disp_inProfitNow = 0;
+	Number(disp_inProfitNow);
+	disp_inProfitNow = inProfitNow;
+	document.getElementById("outProfitNow").value = myComma(disp_inProfitNow);		//営業利益（今期）
+	var disp_inProfitNext = 0;
+	Number(disp_inProfitNext);
+	disp_inProfitNext = inProfitNext;
+	document.getElementById("outProfitNext").value = myComma(disp_inProfitNext);	//営業利益（来季）
+	var disp_inProfitNext2 = 0;
+	Number(disp_inProfitNext2);
+	disp_inProfitNext2 = inProfitNext2;
+	document.getElementById("outProfitNext2").value = myComma(disp_inProfitNext2);	//営業利益（2期後）
+	//------------------------------------------------------------------------------------
+	var outCorporationTaxNow = 0;
+	Number(outCorporationTaxNow);
+	outCorporationTaxNow = inProfitNow * 0.234;									//法人税今季(営業利益（今期）*0.4)
+	outCorporationTaxNow = myRound(outCorporationTaxNow, 0);					//編集(小数点第0)	
+	var dispaly_outCorporationTaxNow = 0;
+	Number(dispaly_outCorporationTaxNow);
+	dispaly_outCorporationTaxNow = outCorporationTaxNow;
+	document.getElementById("outCorporationTaxNow").value = myComma(dispaly_outCorporationTaxNow);
+
+	var outCorporationTaxNext = 0;
+	Number(outCorporationTaxNext);
+	outCorporationTaxNext = inProfitNext * 0.234;									//法人税来季(営業利益（来季）*0.4)
+	outCorporationTaxNext = myRound(outCorporationTaxNext, 0);					//編集(小数点第0)	
+	var disp_outCorporationTaxNext = 0;
+	Number(disp_outCorporationTaxNext);
+	disp_outCorporationTaxNext = outCorporationTaxNext;
+	document.getElementById("outCorporationTaxNext").value = myComma(disp_outCorporationTaxNext);
+
+	var outCorporationTaxNext2 = 0;												//法人税来季(営業利益（2期後）*0.4)
+	Number(outCorporationTaxNext2);
+	outCorporationTaxNext2 = inProfitNext2 * 0.234;								//法人税来季(営業利益（2期後）*0.4)
+	outCorporationTaxNext2 = myRound(outCorporationTaxNext2, 0);				//編集(小数点第0)	
+	var disp_outCorporationTaxNext2 = 0;
+	Number(disp_outCorporationTaxNext2);
+	var disp_outCorporationTaxNext2 = outCorporationTaxNext2;
+	document.getElementById("outCorporationTaxNext2").value = myComma(disp_outCorporationTaxNext2);
+	//------------------------------------------------------------------------------------
+	var outTaxNow = 0;
+	Number(outTaxNow);
+	outTaxNow = inProfitNow - outCorporationTaxNow;								//税引後営業利益(今季)=(営業利益（今期）-法人税(今季))
+	var disp_outTaxNow = 0;
+	Number(disp_outTaxNow);
+	disp_outTaxNow = outTaxNow;
+	document.getElementById("outTaxNow").value = myComma(disp_outTaxNow);					
+
+	var outTaxNext = 0;
+	Number(outTaxNext);
+	outTaxNext = inProfitNext - outCorporationTaxNext;							//税引後営業利益（来季）=(営業利益（来季）-法人税(来季))
+	var disp_outTaxNext = 0;
+	Number(disp_outTaxNext);
+	disp_outTaxNext = outTaxNext;
+	document.getElementById("outTaxNext").value = myComma(disp_outTaxNext);					
+
+	var outTaxNext2 = 0;
+	Number(outTaxNext2);
+	outTaxNext2 = inProfitNext2 - outCorporationTaxNext2;						//税引後営業利益(2期後)=(営業利益（2期後）-法人税(2期後))
+	var disp_outTaxNext2 = 0;
+	Number(outTaxNext2);
+	disp_outTaxNext2 = outTaxNext2;
+	document.getElementById("outTaxNext2").value = myComma(disp_outTaxNext2);					
+	//------------------------------------------------------------------------------------
+
+	var disp_inPriceNow = 0;
+	Number(disp_inPriceNow);
+	disp_inPriceNow = inPriceNow;
+	document.getElementById("outPriceNow").value = myComma(disp_inPriceNow);				//減価償却費(今季)=手入力
+
+	var outPriceNext = 0;
+	Number(outPriceNext);
+	outPriceNext = inProfitNext / inProfitNow * inPriceNow;									//減価償却費(来季)=(営業利益（来季）/営業利益（今期）*減価償却費(今季))
+	var disp_outPriceNext = 0;
+	Number(disp_outPriceNext);
+	disp_outPriceNext = outPriceNext;
+	disp_outPriceNext = myRound(disp_outPriceNext, 0);										//小数点第0	
+	document.getElementById("outPriceNext").value = myComma(disp_outPriceNext);
+
+	var outPriceNext2 = 0;
+	Number(outPriceNext2);
+	outPriceNext2 = inProfitNext2 / inProfitNext * outPriceNext;							//減価償却費（2期後）=(営業利益（2期後）/営業利益（来季）*減価償却費(来季))
+	var disp_outPriceNext2 = 0;
+	Number(disp_outPriceNext2);
+	disp_outPriceNext2 = outPriceNext2;
+	disp_outPriceNext2 = myRound(disp_outPriceNext2, 0);									//小数点第0	
+	document.getElementById("outPriceNext2").value = myComma(disp_outPriceNext2);
+	//------------------------------------------------------------------------------------
+
+	var disp_inEquipmentNow = 0;
+	Number(disp_inEquipmentNow);
+	disp_inEquipmentNow = inEquipmentNow;
+	document.getElementById("outEquipmentNow").value = myComma(disp_inEquipmentNow);		//設備投資額(今季)=手入力
+
+	var outEquipmentNext = 0;
+	Number(outEquipmentNext);
+	outEquipmentNext = inProfitNext / inProfitNow * inEquipmentNow;							//設備投資額(来季)=(営業利益（来季）/営業利益（今期）*設備投資額(今季))
+	var disp_outEquipmentNext = 0;
+	Number(disp_outEquipmentNext);
+	disp_outEquipmentNext = outEquipmentNext;
+	disp_outEquipmentNext = myRound(disp_outEquipmentNext, 0);								//小数点第0	
+	document.getElementById("outEquipmentNext").value = myComma(disp_outEquipmentNext);
+
+	var outEquipmentNext2 = 0;
+	Number(outEquipmentNext2);
+	outEquipmentNext2 = inProfitNext2 / inProfitNext * outEquipmentNext;					//設備投資額（2期後）=(営業利益（2期後）/営業利益（来季）*減価償却費(来季))
+	var disp_outEquipmentNext2 = 0;
+	Number(disp_outEquipmentNext2);
+	disp_outEquipmentNext2 = outEquipmentNext2;
+	disp_outEquipmentNext2 = myRound(disp_outEquipmentNext2, 0);							//小数点第0	
+	document.getElementById("outEquipmentNext2").value = myComma(disp_outEquipmentNext2);
+	//------------------------------------------------------------------------------------
+	
+	//【フリーキャッシュフロー】
+	//------------------------------------------------------------------------------------	
+	var outFreeCashNow = 0;
+	Number(outFreeCashNow);
+	outFreeCashNow = (outTaxNow + (inPriceNow * 100)) - (inEquipmentNow * 100);				//(今季)=税引後営業利益(今季)+減価償却費(今季)*100-設備投資額(今季)*100
+	var disp_outFreeCashNow = outFreeCashNow;
+	disp_outFreeCashNow = myRound(disp_outFreeCashNow, 0);									//小数点第0	
+	document.getElementById("outFreeCashNow").value = myComma(disp_outFreeCashNow);
+	myNumColor("outFreeCashNow",outFreeCashNow);											//マイナス値(赤色)
+	myNumColor("outCopFreeCashNow",outFreeCashNow);											//マイナス値(赤色)-企業価値 
+
+	var outFreeCashNext = 0;
+	Number(outFreeCashNext);
+	outFreeCashNext = (outTaxNext + (outPriceNext * 100)) - (outEquipmentNext * 100);		//(来季)=税引後営業利益(来季)+減価償却費(来季)*100-設備投資額(来季)*100
+	var disp_outFreeCashNext = outFreeCashNext;
+	disp_outFreeCashNext = myRound(disp_outFreeCashNext, 0);								//小数点第0	
+	document.getElementById("outFreeCashNext").value = myComma(disp_outFreeCashNext);
+	myNumColor("outFreeCashNext",outFreeCashNext);											//マイナス値(赤色)
+	myNumColor("outCopFreeCashNext",outFreeCashNext);										//マイナス値(赤色)-企業価値
+
+	var outFreeCashNext2 = 0;
+	Number(outFreeCashNext2);
+	outFreeCashNext2 = (outTaxNext2 + (outPriceNext2 * 100)) - (outEquipmentNext2 * 100);	//(2期後)=税引後営業利益(2期後)+減価償却費(2期後)*100-設備投資額(2期後)*100
+	var disp_outFreeCashNext2 = outFreeCashNext2;
+	disp_outFreeCashNext2 = myRound(disp_outFreeCashNext2, 0);								//小数点第0	
+	document.getElementById("outFreeCashNext2").value = myComma(disp_outFreeCashNext2);
+	myNumColor("outFreeCashNext2",outFreeCashNext2);										//マイナス値(赤色)
+	myNumColor("outCopFreeCashNext2",outFreeCashNext2);										//マイナス値(赤色)-企業価値
+
+	//------------------------------------------------------------------------------------	
+	
+	//割引率(WACC)の計算
+	//------------------------------------------------------------------------------------	
+	var disp_inDebt = 0;
+	Number(disp_inDebt);
+	disp_inDebt = inDebt;
+	document.getElementById("outDebt").value = myComma(disp_inDebt);					//有利子負債額(入力)
+	//------------------------------------------------------------------------------------	
+	var outCurrent = 0;
+	Number(outCurrent);
+	outCurrent = inCurrent * 100;
+	var disp_outCurrent = outCurrent;
+	document.getElementById("outCurrent").value = myComma(disp_outCurrent);				//時価総額(入力)
+	
+//console.log("outCurrent=" + outCurrent);
+	
+	//------------------------------------------------------------------------------------	
+	var disp_DebtCost = 0;
+	Number(disp_DebtCost);
+	disp_DebtCost = 3.0;															//負債コスト(固定値)
+	var disp_Tax = 0;
+	Number(disp_Tax);
+	disp_Tax = 31.0;																//実効税率(固定値)
+
+	var outDebtCost = 0;
+	Number(outDebtCost);
+	outDebtCost = (disp_DebtCost / 100);											//負債コストは％表示の為、100で割る(計算用)
+	var outTax = 0;
+	Number(outTax);
+	outTax = (disp_Tax / 100);														//実効税率は％表示の為、100で割る(計算用)
+
+	document.getElementById("outDebtCost").value = disp_DebtCost.toFixed(1);		//負債コスト(表示小数点１桁)
+	document.getElementById("outTax").value = disp_Tax.toFixed(1);					//実効税率(表示小数点１桁)
+	//------------------------------------------------------------------------------------	
+	
+	//株主資本コストの計算
+	//------------------------------------------------------------------------------------	
+	var disp_outCapitalRisk = 0;
+	Number(disp_outCapitalRisk);
+	disp_outCapitalRisk = 0.1;															//リスクフリーレート(固定値)
+	
+	var outCapitalRisk = 0;
+	Number(outCapitalRisk);
+	outCapitalRisk = (disp_outCapitalRisk / 100);										//リスクフリーレートは％表示の為、100で割る(計算用)
+	
+	document.getElementById("outCapitalRisk").value = disp_outCapitalRisk.toFixed(1);	//リスクフリーレート(表示小数点１桁)
+	//------------------------------------------------------------------------------------	
+	var outCapitalBeta = 0;
+	Number(outCapitalBeta);
+	
+	if((outCurrent > 0) && (outCurrent < 100000)){										//時価総額の値を判定
+		outCapitalBeta = 1.5;
+	}else{
+		if((outCurrent >= 100000) && (outCurrent < 1000000)){
+			outCapitalBeta = 1.2;
+		}else{
+			if((outCurrent >= 1000000)){
+				outCapitalBeta = 1.0;
+			}
+		}
+	}
+	document.getElementById("outCapitalBeta").value = outCapitalBeta.toFixed(1);				//株式のベータ値(表示小数点１桁)
+	//------------------------------------------------------------------------------------	
+	var disp_outCapitalMarket = 0;
+	Number(disp_outCapitalMarket);
+	disp_outCapitalMarket = 11.0;																//株式市場全体の期待収益率(固定値)
+	
+	var outCapitalMarket = 0;
+	Number(outCapitalMarket);
+	outCapitalMarket = (disp_outCapitalMarket / 100);											//株式市場全体の期待収益率は％表示の為、100で割る(計算用)
+
+//console.log("outCapitalMarket=" + outCapitalMarket);
+	
+	document.getElementById("outCapitalMarket").value = disp_outCapitalMarket.toFixed(1);		//株式市場全体の期待収益率(表示小数点１桁)
+	//------------------------------------------------------------------------------------
+	//固定値でのみ計算
+	var outCapitalCost = 0;
+	Number(outCapitalCost);
+	outCapitalCost =outCapitalRisk + (outCapitalBeta * (outCapitalMarket - outCapitalRisk));	//株主資本コスト=リスクフリーレート  + 株式のベータ値  * (株式市場全体の期待収益率 - リスクフリーレート)
+
+	var disp_CapitalCost = 0;
+	Number(disp_CapitalCost);
+	disp_CapitalCost = (outCapitalCost * 100);													//100%表示へ
+	disp_CapitalCost = myRound(disp_CapitalCost, 1);											//小数点第1	
+	document.getElementById("outCapitalCost").value = disp_CapitalCost.toFixed(1);				//株主資本コスト(表示小数点１桁)
+//	document.getElementById("outCapitalCost").value = outCapitalCost;							//株主資本コスト(表示編集なし)
+	//------------------------------------------------------------------------------------	
+
+	
+	//割引率(WACC)
+	//------------------------------------------------------------------------------------	
+	var wacc = 0;
+	Number(wacc);
+	wacc = inDebt + outCurrent;					//(有利子負債額+時価総額)=13000
+//console.log("inDebt + outCurrent=" + wacc);
+	var wacc1 = 0;
+	Number(wacc1);
+	wacc1 = (1 - 0.4);							//固定値(0.6)
+	var wacc2 = 0;
+	Number(wacc2);
+	wacc2 = inDebt / wacc;						//有利子負債額=6000  / (有利子負債額+時価総額)=13000=0.461538461
+	var wacc4 = 0;
+	Number(wacc4);
+	wacc4 = wacc2 * outDebtCost * wacc1;		//wacc2 * 負債コスト=0.03 * 0.6
+	var wacc3 = 0;
+	Number(wacc3);
+	wacc3 = outCurrent / wacc;					//時価総額=7000   /  (有利子負債額+時価総額)=13000 
+	var wacc5 = 0;
+	Number(wacc5);
+	wacc5 = wacc3 * outCapitalCost;				//wacc3 * 株主資本コスト=11.6%
+	var outWacc = 0;
+	Number(outWacc);
+	outWacc = wacc4 + wacc5;
+	var disp_wacc = 0;
+	Number(disp_wacc);
+	disp_wacc = (outWacc * 100);													//100%表示へ
+	disp_wacc = myRound(disp_wacc, 1);												//表示用(小数点第1)
+	document.getElementById("outWacc").value = disp_wacc.toFixed(1);				//WACC(表示小数点１桁)
+//	document.getElementById("outWacc").value = outWacc;								//WACC(表示編集なし)
+	//------------------------------------------------------------------------------------	
+	
+	
+	//継続価値の計算
+	//------------------------------------------------------------------------------------
+	var disp_inRoe = 0;
+	Number(disp_inRoe);
+	disp_inRoe = inRoe;
+	document.getElementById("outRoe").value = myComma(disp_inRoe.toFixed(1));		//ROE[入力]
+	var disp_inDividend = 0;
+	Number(disp_inDividend);
+	disp_inDividend = inDividend;
+	document.getElementById("outDividend").value = myComma(disp_inDividend);		//1株あたりの配当金[入力]
+	var disp_inEps = 0;
+	Number(disp_inEps);
+	disp_inEps = inEps;
+	document.getElementById("outEps").value = myComma(disp_inEps);					//EPS[入力]
+	//------------------------------------------------------------------------------------	
+	var outRate1 = 0;
+	Number(outRate1);
+	outRate1 = (inRoe / 100);														//ROEは％表示の為、100で割る(計算用)
+	var outRate = 0;
+	Number(outRate);
+	outRate = outRate1 * (1 - (inDividend / inEps));								//ROE * (1 - 1株あたりの配当金 /EPS)
+	var disp_Rate = 0;
+	Number(disp_Rate);
+	disp_Rate = (outRate * 100);													//100%表示へ
+	disp_Rate = myRound(disp_Rate, 1);												//表示用(小数点第1)
+	document.getElementById("outRate").value = disp_Rate.toFixed(1);				//フリーキャッシュフローの成長率(表示小数点１桁)
+//	document.getElementById("outRate").value = outRate;								//フリーキャッシュフローの成長率(表示編集なし)
+	
+	//------------------------------------------------------------------------------------	
+	var rateout = 0;
+	Number(rateout);
+	rateout= (1 + outRate);															//(1　+ フリーキャッシュフローの成長率)
+	var rateout1 = 0;
+	Number(rateout1);
+	rateout1 = outFreeCashNext2 * rateout;											//２期後のフリーキャッシュフロー  * (1　+ フリーキャッシュフローの成長率)
+	var roe = 0;							
+	Number(roe);
+	roe = (inRoe / 100);															//ROEは％表示の為、100で割る(計算用)							
+	var roe1 = 0;																	//ROE - フリーキャッシュフローの成長率
+	Number(roe1);
+	roe1 = roe - outRate;															//ROE - フリーキャッシュフローの成長率
+	var outContinuation = 0;
+	Number(outContinuation);
+	outContinuation = rateout1 / roe1;
+	var disp_outContinuation = 0;
+	Number(disp_outContinuation);
+	disp_outContinuation = myRound(outContinuation,0);										//表示用(小数点第0)
+	document.getElementById("outContinuation").value = myComma(disp_outContinuation);		//継続価値
+	myNumColor("outContinuation",outContinuation);											//マイナス値(赤色)
+	//------------------------------------------------------------------------------------	
+	
+	//企業価値
+	//------------------------------------------------------------------------------------	
+	document.getElementById("outCopFreeCashNow").value = myComma(disp_outFreeCashNow);		//今期のフリーキャッシュフロー [OK]
+	document.getElementById("outCopFreeCashNext").value = myComma(disp_outFreeCashNext);	//来期のフリーキャッシュフロー[OK]
+	document.getElementById("outCopFreeCashNext2").value = myComma(disp_outFreeCashNext2);	//２期後のフリーキャッシュフロー[OK]
+	document.getElementById("outCopWacc").value = disp_wacc.toFixed(1);						//WACC[OK]
+	document.getElementById("outCopContinuation").value = myComma(disp_outContinuation);	//継続価値[OK]
+	
+	myNumColor("outCopContinuation",outContinuation);										//マイナス値(赤色)
+	//------------------------------------------------------------------------------------	
+	var Cop100 = 0;						
+	Number(Cop100);
+	Cop100 =(1 + outWacc);														//1 + WACC				
+	var Cop1 = 0;
+	Number(Cop1);
+	Cop1 = outFreeCashNow / Cop100;												//今期のフリーキャッシュフロー / Cop100
+	var Cop2 = 0;
+	Number(Cop2);
+	Cop2 = outFreeCashNext / Math.pow(Cop100,2);								//来期のフリーキャッシュフロー / Cop100
+	var Cop3 = 0;
+	Number(Cop3);
+	Cop3 = outFreeCashNext2 / Math.pow(Cop100,3);								//２期後のフリーキャッシュフロー / Cop100
+	var Cop4 = 0;
+	Number(Cop4);
+	Cop4 = outContinuation / Math.pow(Cop100,3);								//継続価値 / Cop100
+
+	var outCop = 0;
+	Number(outCop);
+	outCop = Cop1 + Cop2 + Cop3 + Cop4;
+	var Disp_Cop = 0;
+	Number(Disp_Cop);
+	Disp_Cop = outCop;
+	Disp_Cop = myRound(Disp_Cop, 0);											//表示用(小数点第0)	
+	document.getElementById("outCop").value = myComma(Disp_Cop);				//企業価値
+	myNumColor("outCop",outCop);												//マイナス値(赤色)
+	
+	//発行済み株式数
+	//------------------------------------------------------------------------------------
+	var disp_inCnt = 0;
+	Number(disp_inCnt);
+	disp_inCnt = inCnt;
+	document.getElementById("outCnt").value = myComma(disp_inCnt);				//発行済み株式数
+	//------------------------------------------------------------------------------------	
+
+	//理論株価
+	//------------------------------------------------------------------------------------	
+	var calc = 0;	
+	Number(calc);
+	calc = (outCop * 1000000) / (inCnt * 1000);									//(企業価値*1000000) / (発行済み株式数 * 1000)	
+	var disp_calc = 0;
+	Number(disp_calc);
+	disp_calc = calc;
+	disp_calc = myRound(disp_calc, 0);											//表示用(小数点第0)
+	document.getElementById("outcalc").value = myComma(disp_calc);				//理論株価
+	//------------------------------------------------------------------------------------	
+	
+	//計算結果までスクロール
+
+	pageScroll("calc_top");
+	
+}
+
+function myNumColor(id,num){
+	//マイナス値の場合
+	if(num < 0){
+		document.getElementById(id).style.color="Red";
+	}else{
+		document.getElementById(id).style.color="Black";
+	}
+}
+
+function myRound(val, precision)
+{
+     //小数点を移動させる為の数を10のべき乗で求める
+     digit = Math.pow(10, precision);
+ 
+     //四捨五入したい数字に digit を掛けて小数点を移動
+     val = val * digit;
+ 
+     //roundを使って四捨五入
+     val = Math.round(val);
+ 
+     //移動させた小数点を digit で割ることでもとに戻す
+     val = val / digit;
+ 
+     return val;
+}
+//数字にカンマを付ける
+function myComma(num) {
+	num = new String(num).replace(/,/g, ""); //一旦カンマを削除
+	while(num != (num = num.replace(/^(-?\d+)(\d{3})/, "$1,$2"))); //3桁毎にカンマを挿入
+	return num;
+}
+
+function myChkStr(inProfitNow,inProfitNext,inProfitNext2,inPriceNow,inEquipmentNow,inDebt,inCurrent,inRoe,inDividend,inEps,inCnt){
+
+	var intErr = 0;
+	//文字数チェック
+	//営業利益（今期）
+	if(inProfitNow.length == 0){
+		document.getElementById("error1").innerHTML = "営業利益（今期）を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//営業利益（来季）
+	if(inProfitNext.length == 0){
+		document.getElementById("error2").innerHTML = "営業利益（来季）を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//営業利益（2期後）
+	if(inProfitNext2.length == 0){
+		document.getElementById("error3").innerHTML = "営業利益（2期後）を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//減価償却費(今期)
+	if(inPriceNow.length == 0){
+		document.getElementById("error4").innerHTML = "減価償却費を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//設備投資額(今期)
+	if(inEquipmentNow.length == 0){
+		document.getElementById("error5").innerHTML = "設備投資額を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//有利子負債額
+	if(inDebt.length == 0){
+		document.getElementById("error6").innerHTML = "有利子負債額を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//時価総額
+	if(inCurrent.length == 0){
+		document.getElementById("error7").innerHTML = "時価総額を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//ROE
+	if(inRoe.length == 0){
+		document.getElementById("error8").innerHTML = "ROEを入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//1株あたりの配当金
+	if(inDividend.length == 0){
+		document.getElementById("error9").innerHTML = "1株あたりの配当金を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//EPS
+	if(inEps.length == 0){
+		document.getElementById("error10").innerHTML = "EPSを入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//発行済み株式数
+	if(inCnt.length == 0){
+		document.getElementById("error11").innerHTML = "発行済み株式数を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+
+	if(intErr > 0){
+		return false;
+	}else{
+		return true;
+	}
+}
+
+function myChkNum(inProfitNow,inProfitNext,inProfitNext2,inPriceNow,inEquipmentNow,inDebt,inCurrent,inRoe,inDividend,inEps,inCnt){
+
+	var intErr = 0;
+	//文字数チェック
+	//営業利益（今期）
+	if(!(inProfitNow > 0)){
+		document.getElementById("error1").innerHTML = "営業利益（今期）に文字があります。半角数値を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//営業利益（来季）
+	if(!(inProfitNext > 0)){
+		document.getElementById("error2").innerHTML = "営業利益（来季）に文字があります。半角数値を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//営業利益（2期後）
+	if(!(inProfitNext2 > 0)){
+		document.getElementById("error3").innerHTML = "営業利益（2期後）に文字があります。半角数値を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//減価償却費(今期)
+	if(!(inPriceNow >= 0)){
+		document.getElementById("error4").innerHTML = "減価償却費に文字があります。半角数値を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//設備投資額(今期)
+	if(!(inEquipmentNow >= 0)){
+		document.getElementById("error5").innerHTML = "設備投資額に文字があります。半角数値を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//有利子負債額
+	if(!(inDebt >= 0)){
+		document.getElementById("error6").innerHTML = "有利子負債額に文字があります。半角数値を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//時価総額
+	if(!(inCurrent > 0)){
+		document.getElementById("error7").innerHTML = "時価総額に文字があります。半角数値を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//ROE
+	if(!(inRoe > 0)){
+		document.getElementById("error8").innerHTML = "ROEに文字があります。半角数値を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//1株あたりの配当金
+	if(!(inDividend >= 0)){
+		document.getElementById("error9").innerHTML = "1株あたりの配当金に文字があります。半角数値を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//EPS
+	if(!(inEps > 0)){
+		document.getElementById("error10").innerHTML = "EPSに文字があります。半角数値を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+	//発行済み株式数
+	if(!(inCnt > 0)){
+		document.getElementById("error11").innerHTML = "発行済み株式数に文字があります。半角数値を入力してください。";
+		intErr = intErr + 1;
+//		return false;
+	}
+
+	if(intErr > 0){
+		return false;
+	}else{
+		return true;
+	}
+}
+
+
+</script>
+
+
+<script type="text/javascript">
+// forked from cojicoji.gray's "指定したID属性のタグまでスクロールする" http://jsdo.it/cojicoji.gray/dgdA
+var objPageScrollTimer;					// タイマーオブジェクト
+var intPageScrollTimerInterval = 3;		// 移動時間間隔（ms）
+var intPageScrollRate = 5;				// 移動する距離割合（現在位置から目的地までの○○%分移動させる）
+var intPageScrollGoalTop;				// 目的のY座標
+
+//ページ内の指定したID属性のタグまでスクロールする
+function pageScroll(objID)
+{
+    // タイマー初期化
+    if (objPageScrollTimer) clearInterval(objPageScrollTimer);
+    
+	if(document.getElementById(objID)){
+		// 目的の要素までのY座標を取得
+		var objBounds = document.getElementById(objID).getBoundingClientRect();
+		intPageScrollGoalTop = objBounds.top;
+		// タイマーセット
+		objPageScrollTimer = setInterval("pageScrolling()", intPageScrollTimerInterval);
+	}
+	
+    return false;
+}
+
+function pageScrolling()
+{   
+	// 現在のY座標を取得
+	var intNowY = document.documentElement.scrollTop || document.body.scrollTop;
+		
+	// 移動距離を計算
+	scrollLength = Math.ceil((intPageScrollGoalTop - intNowY) * (intPageScrollRate/100));
+
+	// スクロールの移動
+	scrollBy(0, scrollLength);
+
+	// 移動後のY座標を取得
+	var intNewY = document.documentElement.scrollTop || document.body.scrollTop;
+
+	// 目的の座標を越えるか移動後の座標変化がない場合はタイマー停止
+	if (intPageScrollGoalTop <= intNowY || intNewY == intNowY){
+		objPageScrollTimer = clearInterval(objPageScrollTimer);
+	}
+}
+</script>
+
+</head>
+
+<body>
+
+<div id="header">
+<h1><img src="top.jpg"></h1>
+</div>
+<div id="contents">
+<p>企業の理論株価を割り出します。<br />下記の項目を入力後「計算する」ボタンをクリックしてください。</p>
+<form id="input">
+<h3>データ入力</h3>
+<p class="error" id="error1"></p>
+<p class="error" id="error2"></p>
+<p class="error" id="error3"></p>
+<p class="error" id="error4"></p>
+<p class="error" id="error5"></p>
+<p class="error" id="error6"></p>
+<p class="error" id="error7"></p>
+<p class="error" id="error8"></p>
+<p class="error" id="error9"></p>
+<p class="error" id="error10"></p>
+<p class="error" id="error11"></p>
+<ul class="clearfix">
+<li><label><span>営業利益（今期）</span><input type="text" id="inProfitNow" value="" />百万円</label></li>
+<li><label><span>営業利益（来期）</span><input type="text" id="inProfitNext" value="" />百万円</label></li>
+<li><label><span>営業利益（2期後）</span><input type="text" id="inProfitNext2" value="" />百万円</label></li>
+<li><label><span>減価償却費</span><input type="text" id="inPriceNow" value="" />億円</label></li>
+<li><label><span>設備投資額</span><input type="text" id="inEquipmentNow" value="" />億円</label></li>
+<li><label><span>有利子負債額</span><input type="text" id="inDebt" value="" />百万円</label></li>
+<li><label><span>時価総額</span><input type="text" id="inCurrent" value="" />億円</label></li>
+<li><label><span>ROE</span><input type="text" id="inRoe" value="" />%</label></li>
+<li><label><span>1株あたりの配当金</span><input type="text" id="inDividend" value="" />円</label></li>
+<li><label><span>EPS</span><input type="text" id="inEps" value="" /></label></li>
+<li><label><span>発行済み株式数</span><input type="text" id="inCnt" value="" />千株</label></li>
+</ul>
+<input id="calc_btn" type="button" value="理論株価を計算をする" onclick="myCalc()"/>
+</form>
+<form id="output">
+<h3 id="calc_top">計算結果</h3>
+<table id="freeCacheFlow">
+<caption>フリーキャッシュフロー</caption>
+<colgroup span="1"></colgroup>
+<colgroup span="3" class="fcf"></colgroup>
+<thead>
+<tr>
+<td>&nbsp;</td>
+<td>今期</td>
+<td>来期</td>
+<td>2期後</td>
+</tr>
+</thead>
+<tfoot class="result">
+<tr>
+<th>フリーキャッシュフロー</th>
+<td><input type="text" id="outFreeCashNow" value="" /></td>
+<td><input type="text" id="outFreeCashNext" value="" /></td>
+<td><input type="text" id="outFreeCashNext2" value="" /></td>
+</tr>
+</tfoot>
+<tbody>
+<tr>
+<th>営業利益（百万円）</th>
+<td><input type="text" id="outProfitNow" value="" /></td>
+<td><input type="text" id="outProfitNext" value="" /></td>
+<td><input type="text" id="outProfitNext2" value="" /></td>
+</tr>
+<tr>
+<th>法人税</th>
+<td><input type="text" id="outCorporationTaxNow" value="" /></td>
+<td><input type="text" id="outCorporationTaxNext" value="" /></td>
+<td><input type="text" id="outCorporationTaxNext2" value="" /></td>
+</tr>
+<tr>
+<th>税引後営業利益</th>
+<td><input type="text" id="outTaxNow" value="" /></td>
+<td><input type="text" id="outTaxNext" value="" /></td>
+<td><input type="text" id="outTaxNext2" value="" /></td>
+</tr>
+<tr>
+<th>減価償却費（億円）</th>
+<td><input type="text" id="outPriceNow" value="" /></td>
+<td><input type="text" id="outPriceNext" value="" /></td>
+<td><input type="text" id="outPriceNext2" value="" /></td>
+</tr>
+<tr>
+<th>設備投資額（億円）</th>
+<td><input type="text" id="outEquipmentNow" value="" /></td>
+<td><input type="text" id="outEquipmentNext" value="" /></td>
+<td><input type="text" id="outEquipmentNext2" value="" /></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>株主資本コスト</caption>
+<colgroup>
+</colgroup>
+<tfoot class="result">
+<tr>
+<th>株主資本コスト＝</th>
+<td><input type="text" id="outCapitalCost" value="" /></td>
+</tr>
+</tfoot>
+<tbody>
+<tr>
+<th>リスクフリーレート</th>
+<td><input type="text" id="outCapitalRisk" value="" />%</td>
+</tr>
+<tr>
+<th>株式のベータ値</th>
+<td><input type="text" id="outCapitalBeta" value="" /></td></tr>
+<tr>
+<th>株式市場全体の期待収益率</th>
+<td><input type="text" id="outCapitalMarket" value="" />%</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>割引率（WACC）</caption>
+<colgroup></colgroup>
+<tfoot class="result">
+<tr>
+<th>WACC＝</th>
+<td><input type="text" id="outWacc" value="" />%</td>
+</tr>
+</tfoot>
+<tbody>
+<tr>
+<th>有利子負債額</th>
+<td><input type="text" id="outDebt" value="" />百万円</td>
+</tr>
+<tr>
+<th>時価総額</th>
+<td><input type="text" id="outCurrent" value="" />百万円</td>
+</tr>
+<tr>
+<th>負債コスト</th>
+<td><input type="text" id="outDebtCost" value="" />%</td>
+</tr>
+<tr>
+<th>実効税率</th>
+<td><input type="text" id="outTax" value="" />%</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>継続価値</caption>
+<colgroup></colgroup>
+<tfoot class="result">
+<tr>
+<th>継続価値＝</th>
+<td><input type="text" id="outContinuation" value="" /></td>
+</tr>
+</tfoot>
+<tbody>
+<tr>
+<th>ROE</th>
+<td><input type="text" id="outRoe" value="" />%</td>
+</tr>
+<tr>
+<th>1株あたりの配当金</th>
+<td><input type="text" id="outDividend" value="" />円</td>
+</tr>
+<tr>
+<th>EPS</th>
+<td><input type="text" id="outEps" value="" />円</td>
+</tr>
+<tr>
+<th>フリーキャッシュフローの成長率</th>
+<td><input type="text" id="outRate" value="" />%</td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>企業価値</caption>
+<colgroup></colgroup>
+<tfoot class="result">
+<tr>
+<th>企業価値＝</th>
+<td><input type="text"  id="outCop" value="" /></td>
+</tr>
+</tfoot>
+<tbody>
+<tr>
+<th>今期のフリーキャッシュフロー</th>
+<td><input type="text" id="outCopFreeCashNow" value="" /></td>
+</tr>
+<tr>
+<th>来季のフリーキャッシュフロー</th>
+<td><input type="text" id="outCopFreeCashNext" value="" /></td>
+</tr>
+<tr>
+<th>2期後のフリーキャッシュフロー</th>
+<td><input type="text" id="outCopFreeCashNext2" value="" /></td>
+</tr>
+<tr>
+<th>WACC</th>
+<td><input type="text" id="outCopWacc" value="" />%</td>
+</tr>
+<tr>
+<th>継続価値</th>
+<td><input type="text" id="outCopContinuation" value="" /></td>
+</tr>
+</tbody>
+</table>
+<table>
+<caption>発行済み株式数</caption>
+<colgroup></colgroup>
+<tfoot class="result">
+<tr>
+<th>発行済み株式数</th>
+<td><input type="text" id="outCnt" value="" />千株</td>
+</tr>
+</tfoot>
+<tbody>
+</tbody>
+</table><table>
+<tbody class="result2">
+<tr>
+<th>理論株価＝</th>
+<td><input type="text"  id="outcalc" value="" />円</td>
+</tr>
+</tbody>
+</table>
+</form>
+<div id="footLink">
+<p><a href="#input">再計算</a></p>
+</div>
+</div>
+<a href="#header" class="gotop">Go Top</a>
+<!--<iframe name="seamless" src="http://www.kabutomato.jp/lp/stockPriceSheet/ifin/ad.html" scrolling="no" class="autoHeight"></iframe>-->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://kabutomato.jp/js/jquery-1.10.2.min.js"><\/script>')</script>
+<script src="http://www.kabutomato.jp/lp/stockPriceSheet/js/gotop.js"></script>
+<!--<script src="http://www.kabutomato.jp/lp/stockPriceSheet/js/jquery.autoheight.js"></script>  -->
+
+</body>
+</html>

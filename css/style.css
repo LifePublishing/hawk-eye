@@ -1,0 +1,263 @@
+@charset "UTF-8";
+/* CSS Document */
+h1 img {
+    width: 100%;
+}
+.clearfix {
+	zoom: 1;
+}
+.clearfix:after {
+    content: ""; 
+    display: block; 
+    clear: both;
+}
+div#header {
+	display: table;
+	width: 100%;
+	margin: 0 auto;
+	background-color: #001322;
+}
+div#header h1 {
+	display: table-cell;
+	padding: 0 5% 0 5%;
+	font-size: 2em;
+	line-height: 1.25;
+	color: #FFF67F;
+}
+h1 img{text-align:center}
+/* div#header p {
+	display: table-cell;
+	padding: 0 5% 0 5%;
+	text-align: right;
+} */
+div#header  p img {
+	width: auto;
+	height: 1.7em;
+}
+div#contents {
+	width: 90%;
+	margin: 0 auto;
+}
+div#title {
+	display: table;
+	width: 100%;
+	margin: 0 0 2em;
+	padding: 0 0 0.2em;
+	border-bottom: dotted 1px #000;
+}
+div#title h2,
+div#title p {
+	display: table-cell;
+	margin: 0;
+}
+div#title h2 {
+	font-size: 1.6em
+}
+div#title p {
+	text-align: right;
+}
+h3 {
+	width: 100%;
+	margin: 1.5em 0 1.2em;
+	padding: 0.2em 0;
+	background-color: #001322;
+	font-size: 1.3em;
+	text-indent: 1em;
+	color: #fff;
+}
+form p.error {
+	color: #FF0000;
+}
+form {
+	width: 90%;
+	margin: 0 auto 2em;
+}
+form#input ul {
+	width: 100%;
+	margin: 0 0 1.2em;
+	padding: 0;
+	list-style: none;
+}
+form#input ul li {
+	width: 30em;
+	margin: 0 2em 0.75em 0;
+	float: left;
+}
+form#input ul li label span {
+	display: inline-block;
+	width: 9.5em;
+}
+form#input ul li label input {
+	width: 8em;
+	margin: 0 0.2em 0 0;
+	border: solid 1px #ccc;
+	border-radius: 4px;
+	font-size: 1.6em;
+	text-align: right;
+}
+form#input input[type=button] {
+	display: block;
+	width: 100%;
+	margin: 0;
+	padding: 0.5em 0;
+	border: none;
+	background-color: #22a000;
+	font-size: 2em;
+	font-weight: bold;
+	color: #fff;
+box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.29);border-radius:3px
+}
+form#input input[type=button]:active  {
+  -webkit-transform: translateY(4px);
+  transform: translateY(4px);
+  box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.2);
+  border-bottom: none;
+}
+form#output table {
+	width: 30em;
+	margin: 0 0 1em;
+	text-align: left;
+}
+form#output table#freeCacheFlow {
+	width: 100%;
+}
+form#output table caption {
+	margin: 0 0 0.1em;
+	font-weight: bold;
+	text-align: left;
+	color: #666;
+}
+form#output table colgroup {
+	width: 17em;
+}
+form#output table tbody,
+form#output table tfoot {
+	border: solid 0.4em #000;
+}
+form#output table tbody tr {
+	border: dotted 1px #000;
+}
+form#output table td,
+form#output table th {
+	padding: 0.25em 0.5em;
+}
+form#output table td input,
+form#output table th input {
+	width: 6.5em;
+	border: none;
+	font-size: 1.2em;
+	text-align: right;
+}
+form#output table .result tr,
+form#output table .result input {
+	background-color:rgba(255, 220, 46, 1);
+}
+form#output table .result2 tr,
+form#output table .result2 input {
+	background-color: #FF0000;
+	color: #fff;
+}
+form#output table .result2 tr th,
+form#output table .result2 tr td {
+	font-size: 2em;
+	font-weight: bold;
+}
+form#output table .result2 tr th {
+	width: 5.2em;
+}
+form#output table .result2 tr td input {
+	width: 5em;
+}
+form#output table#freeCacheFlow colgroup.fcf {
+	width: 8em;
+}
+form#output table#freeCacheFlow tr td {
+	text-align: right;
+}
+form#output table#freeCacheFlow thead tr td {
+	text-align: center;
+}
+form#output table#freeCacheFlow input {
+	width: 100%;
+}
+
+
+div#footLink {
+	width: 90%;
+	margin: 0 auto 2em;
+}
+div#footLink p {
+	margin: 0;
+}
+iframe {
+	width: 100%;
+	min-height: 278px;
+	border: none;
+}
+div#footer {
+	width: 100%;
+	padding: 1em 0;
+	background-color: #ccc;
+}
+div#footer #ad {
+	width: 90%;
+	padding: 0 5%;
+	text-align: center;
+}
+div#footer #ad a img {
+	padding: 0 1% 1% 0;
+}
+div#footer p {
+	margin: 0.1em 0 0;
+	padding: 0 5%;
+	font-size: 0.8em;
+	text-align: center;
+	color: #fff;
+}
+
+/* gotop */
+
+a.gotop {
+    display: none;
+    position: fixed;
+    bottom: 2em;
+    right: 2em;
+    padding: 1em;
+    background-color: rgba(0, 0, 0, 0.25);
+	border: solid 1px #FFF;
+    text-decoration: none;
+    font-size: 14px;
+	color: #FFF;
+}
+a.gotop:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+@media screen and (max-width:599px) {
+
+body {
+	font-size: 9.5px;
+}
+form {
+	width: 100%;
+}
+
+/* gotop */
+a.gotop {
+    display: none;
+    position: fixed;
+	z-index: 1000;
+    bottom: 1em;
+    right: 1em;
+    padding: 1em;
+    background-color: rgba(0, 0, 0, 0.4);
+	border: solid 1px #FFF;
+    text-decoration: none;
+    font-size: 12px;
+	color: #FFF;
+}
+a.gotop:active {
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+}
